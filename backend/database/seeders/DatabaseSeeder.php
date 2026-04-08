@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // 1. Fix the "Test User" by adding the missing campus_id
-        \App\Models\User::factory()->create([
+        User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
             'campus_id' => 'A00000000', // This satisfies the NOT NULL constraint!

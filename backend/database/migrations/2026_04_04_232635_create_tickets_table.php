@@ -12,11 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tickets', function (Blueprint $table) {
-            $table->id();
+            $table->id(); // ticket id
             $table->foreignId('user_id')->constrained();
             $table->foreignId('location_id')->constrained();
             $table->foreignId('department_id')->constrained();
-
 
             $table->string('title');
             $table->text('content');
@@ -24,7 +23,7 @@ return new class extends Migration
             $table->enum('status', ['needs-attention', 'in-progress', 'resolved'])->default('needs-attention');
             $table->string('priority')->default(1);
 
-
+            // ai summary stored as json with keys: summary, key_points, recommended_actions
             $table->json('ai_summary')->nullable();
             $table->timestamps();
         });

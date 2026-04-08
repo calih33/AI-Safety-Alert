@@ -11,14 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Use CREATE to build the table for the first time
         Schema::create('departments', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique(); // e.g., Medical, Security, Janitorial
+            $table->string('name')->unique();
             $table->string('email')->nullable();
             $table->string('phone')->nullable();
 
-            // This links the department to its main office/location
             $table->foreignId('location_id')->constrained()->onDelete('cascade');
 
             $table->timestamps();

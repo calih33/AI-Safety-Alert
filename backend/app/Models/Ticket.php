@@ -34,10 +34,17 @@ class Ticket extends Model
     {
         return $this->belongsTo(Department::class);
     }
+    // app/Models/Ticket.php
+
     public function assignedStaff(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
-        return $this->belongsToMany(Staff::class, 'staff_assignments')
-            ->withTimestamps();
+        // Arguments: RelatedModel, table_name, foreign_key_for_this_model, foreign_key_for_other_model
+        return $this->belongsToMany(
+            Staff::class,
+            'staff_assignments',
+            'ticket_id',
+            'user_id'
+        )->withTimestamps();
     }
     public function history()
     {
