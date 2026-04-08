@@ -12,19 +12,41 @@ class Staff extends Model
 
     protected $fillable = [
         'user_id',
-        'department',
-        'location',
+        'department_id',
+        'location_id',
         'phone',
     ];
 
+    /**
+     * This links the staff record back to the login/auth info.
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function tickets(): BelongsToMany
+    /**
+     * Links to the Medical, Security, or Janitorial entries.
+     */
+    public function department(): BelongsTo
     {
-        return $this->belongsToMany(Ticket::class, 'staff_assignments')
+        return $this->belongsTo(Department::class);
+    }
+
+    /**
+     * Where the staff member is usually stationed.
+     */
+    public function location(): BelongsTo
+    {
+        return $this->belongsTo(Location::class);
+    }
+
+    /**
+     * Relationship is to assign tickets
+     */
+    public function assignedTickets(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Ticket::class, 'staff_assignments', 'user_id', 'ticket_id')
             ->withTimestamps();
     }
 }

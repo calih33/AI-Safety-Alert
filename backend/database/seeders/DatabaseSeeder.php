@@ -15,11 +15,14 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
+        // 1. Fix the "Test User" by adding the missing campus_id
+        \App\Models\User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
+            'campus_id' => 'A00000000', // This satisfies the NOT NULL constraint!
         ]);
+
+        // 2. Call your custom CampusSeeder to build the real environment
+        $this->call(CampusSeeder::class);
     }
 }

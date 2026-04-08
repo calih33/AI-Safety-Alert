@@ -2,41 +2,45 @@
 
 namespace App\Models;
 
-use App\Models\Location;
-use App\Models\Staff;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Ticket extends Model
 {
     protected $fillable = [
-        'userID',
-        'ticketID',
+        'user_id',
         'location_id',
-        'status',
-        'department',
-        'priority',
+        'department_id',
         'title',
         'content',
-        'ticket_date',
+        'status',
+        'priority',
+        'ai_summary'
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'ticket_date' => 'date',
-        ];
-    }
+    protected $casts = [
+        'ai_summary' => 'array',
+        'priority' => 'integer',
+    ];
 
-    public function location(): BelongsTo
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+    public function location()
     {
         return $this->belongsTo(Location::class);
     }
-
-    public function staff(): BelongsToMany
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
+    }
+    public function assignedStaff(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(Staff::class, 'staff_assignments')
             ->withTimestamps();
+    }
+    public function history()
+    {
+        return $this->hasMany(TicketHistory::class);
     }
 }
