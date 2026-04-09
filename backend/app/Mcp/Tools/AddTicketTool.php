@@ -10,14 +10,13 @@ use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Attributes\Description;
 use Laravel\Mcp\Server\Tool;
 
-#[Description("Add a ticket item to the database. It takes user_id, location_id, department_id, title, and content as parameters.")]
+#[Description("Add a ticket item to the database. It takes user_id, location_id, title, and content as parameters.")]
 class AddTicketTool extends Tool {
     public function handle(Request $request): Response {
         $validated = $request->validate( 
             [
                 'user_id' => 'required|integer',
                 'location_id' => 'required|integer',
-                'department_id' => 'required|integer',
                 'title' => 'required|string',
                 'content' => 'required|string',
             ]);
@@ -25,6 +24,7 @@ class AddTicketTool extends Tool {
         $content = $validated['content'];
         $validated['priority'] = AIController::generatePriority($content);
         $validated['ai_summary'] = AIController::generateSummary($content);
+        $validated['department_id'] = AIController::generateDepartmentID($content);
         $validated['status'] = 'needs-attention';
 
         $ticket = Ticket::create($validated);
@@ -41,9 +41,6 @@ class AddTicketTool extends Tool {
                 ->required(),
             'location_id' => $schema->integer()
                 ->description("The ID of the location where the ticket is reported")
-                ->required(),
-            'department_id' => $schema->integer()
-                ->description("The ID of the department responsible for the ticket")
                 ->required(),
             'title' => $schema->string()
                 ->description("The title of the ticket")

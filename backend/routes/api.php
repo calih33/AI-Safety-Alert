@@ -10,3 +10,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
         return $request->user();
     });
 });
+
+Route::get("ai/priority/{content}", function (string $content) {
+    return AIController::generatePriority($content);
+});
+
+Route::get("ai/department/{content}", function (string $content) {
+    return AIController::generateDepartmentID($content);
+});
