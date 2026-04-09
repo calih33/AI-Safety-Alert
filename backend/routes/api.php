@@ -1,12 +1,12 @@
 <?php
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AIController;
 
-Route::get('ai/summary/{content}', function (string $content) {
-    return AIController::generateSummary($content);
-});
+Route::middleware('api')->group(base_path('routes/auth.php'));
 
-Route::get("ai/priority/{content}", function (string $content) {
-    return AIController::generatePriority($content);
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
 });
