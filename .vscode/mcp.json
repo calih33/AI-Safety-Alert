@@ -1,0 +1,9 @@
+{
+	"servers": {
+		"ticket-mcp-server": {
+			"url": "http://localhost:8080/mcp/ticket",
+			"type": "http"
+		}
+	},
+	"inputs": []
+}
