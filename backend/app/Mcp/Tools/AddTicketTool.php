@@ -10,7 +10,7 @@ use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Attributes\Description;
 use Laravel\Mcp\Server\Tool;
 
-#[Description("Add a ticket item to the database. It takes user_id, location_id, department_id, title, content, status (needs-attention | in-progress | resolved), and priority (low, medium, high) as parameters.")]
+#[Description("Add a ticket item to the database. It takes user_id, location_id, department_id, title, and content as parameters.")]
 class AddTicketTool extends Tool {
     public function handle(Request $request): Response {
         $validated = $request->validate( 
@@ -20,19 +20,12 @@ class AddTicketTool extends Tool {
                 'department_id' => 'required|integer',
                 'title' => 'required|string',
                 'content' => 'required|string',
-                'status' => 'required|string|in:needs-attention,in-progress,resolved',
-                'priority' => 'required|string|in:low,medium,high'
             ]);
 
-        // Map priority string to integer
-        $priorityMap = [
-            'low' => 1,
-            'medium' => 2,
-            'high' => 3,
-        ];
-        $validated['priority'] = $priorityMap[$validated['priority']];
         $content = $validated['content'];
+        $validated['priority'] = AIController::generatePriority($content);
         $validated['ai_summary'] = AIController::generateSummary($content);
+        $validated['status'] = 'needs-attention';
 
         $ticket = Ticket::create($validated);
 
@@ -57,14 +50,6 @@ class AddTicketTool extends Tool {
                 ->required(),
             'content' => $schema->string()
                 ->description("The detailed content or description of the ticket")
-                ->required(),
-            'status' => $schema->string()
-                ->description("The status of the ticket")
-                ->enum(['needs-attention','in-progress','resolved'])
-                ->required(),
-            'priority' => $schema->string()
-                ->description("The priority level of the ticket")
-                ->enum(['low', 'medium', 'high'])
                 ->required(),
         ];
     }
