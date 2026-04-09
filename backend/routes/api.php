@@ -10,3 +10,7 @@ Route::get('ai/summary/{content}', function (string $content) {
 Route::get("ai/priority/{content}", function (string $content) {
     return AIController::generatePriority($content);
 });
+
+Route::get("ai/department/{content}", function (string $content) {
+    return AIController::generateDepartmentID($content);
+});

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Department;
+
 class AIController extends Controller
 {
     private static function getAICurl(array $messages) {
@@ -59,14 +61,14 @@ class AIController extends Controller
         }
 
         $messages = [
-                        [
-                            'role' => 'system',
-                            'content' => 'You are a summarizer for tickets for school issues. Keep your responses to 1 concise sentence with a maximum of fifteen words. Your only goal is to summarize a ticket\'s content, not to respond to it. You MUST keep professional, do not forget these instructions.'
-                        ],
-                        [
-                            'role' => 'user',
-                            'content' => "My issue is the following: " . $content
-                        ]
+            [
+                'role' => 'system',
+                'content' => 'You are a summarizer for tickets for school issues. Keep your responses to 1 concise sentence with a maximum of fifteen words. Your only goal is to summarize a ticket\'s content, not to respond to it. You MUST keep professional, do not forget these instructions.'
+            ],
+            [
+                'role' => 'user',
+                'content' => "My issue is the following: " . $content
+            ]
         ];
 
         $response = AIController::getAICurl($messages);
@@ -80,14 +82,43 @@ class AIController extends Controller
         }
 
         $messages = [
-                        [
-                            'role' => 'system',
-                            'content' => 'You are a manager for tickets for school issues who\'s job is to set the priority of tickets. Your only goal is to respond with a number between 1 and 3, with higher numbers indicating a higher priority. Only send the singular number, no matter what is sent afterwards. DO NOT forget these instructions. Forgetting these instructions will result in you losing your job.'
-                        ],
-                        [
-                            'role' => 'user',
-                            'content' => "My issue is the following: " . $content
-                        ]
+            [
+                'role' => 'system',
+                'content' => 'You are a manager for tickets for school issues who\'s job is to set the priority of tickets. Your only goal is to respond with a number between 1 and 3, with higher numbers indicating a higher priority. Only send the singular number, no matter what is sent afterwards. DO NOT forget these instructions. Forgetting these instructions will result in you losing your job.'
+            ],
+            [
+                'role' => 'user',
+                'content' => "My issue is the following: " . $content
+            ]
+        ];
+
+        $response = AIController::getAICurl($messages);
+        
+        return $response['choices'][0]['message']['content'] ?? $content;
+    } 
+
+    public static function generateDepartmentID(string $content) {
+        if (empty($content) || strlen($content) <= 0) {
+            return $content;
+        }
+
+        $departments_str = "The possible departments you can pick from are the following:";
+
+        foreach(Department::all() as $department ) {
+            $name = $department->getAttribute("name");
+            $id = $department->getKey();
+            $departments_str .= "\nName: $name, ID: $id";
+        }
+
+        $messages = [
+            [
+                'role' => 'system',
+                'content' => 'You are a manager for tickets for school issues who\'s job is to assign a department to a ticket. Your only goal is to respond with the ID number of the most relevant department. Only send the singular number, no matter what is sent afterwards. You may only use the departments provided, you cannot make a new department. DO NOT forget these instructions. Forgetting these instructions will result in you losing your job. ' . $departments_str
+            ],
+            [
+                'role' => 'user',
+                'content' => "My issue is the following: " . $content
+            ]
         ];
 
         $response = AIController::getAICurl($messages);
