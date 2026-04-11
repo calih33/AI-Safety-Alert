@@ -15,3 +15,11 @@ touch database/database.sqlite
 php artisan migrate:refresh --seed
 
 php artisan serve
+
+<h2>FRONTEND LAUNCHING</h2>
+
+cd frontend
+
+npm install
+
+npm run dev
