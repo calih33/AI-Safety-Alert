@@ -1,141 +1,135 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
-  const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
+
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const { name, value } = e.target;
+
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/login", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(form),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Login failed");
+      }
+
+      if (data.authorisation?.token) {
+        localStorage.setItem("token", data.authorisation.token);
+      }
+
+      if (data.user) {
+        localStorage.setItem("user", JSON.stringify(data.user));
+      }
+
+      navigate("/dashboard");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to login");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
-    <div className="bg-gray-200 w-full min-h-screen flex items-center justify-center">
-      <div className="w-full py-4">
-      
-        <div className="bg-white w-5/6 md:w-3/4 lg:w-2/3 xl:w-[500px] 2xl:w-[550px] mt-8 mx-auto px-10 py-8 rounded-lg shadow-2xl">
-        <div className="flex items-cent er justify-center space-x-2">
-          <h1 className="text-2xl font-bold text-blue-600 py-4 pb-10">
-            Logo here
-          </h1>
-        </div>
-          <h2 className="text-center text-2xl font-bold tracking-wide text-gray-800">
-            Sign In
-          </h2>
-
-          <p className="text-center text-sm text-gray-600 mt-2">
-            Don&apos;t have an account?{" "}
-            <Link
-              to="/register"
-              className="text-blue-600 hover:text-blue-700 hover:underline"
-              title="Sign Up"
-            >
-              Sign up here
-            </Link>
-          </p>
-
-          <form className="my-8 text-sm">
-            <div className="flex flex-col my-4">
-              <label htmlFor="email" className="text-gray-700">
-                Email Address
-              </label>
-              <input
-                type="email"
-                name="email"
-                id="email"
-                className="mt-2 p-2 border border-gray-300 focus:outline-none focus:ring-0 focus:border-gray-300 rounded text-sm text-gray-900"
-                placeholder="Enter your email"
-              />
+    <div className="min-h-screen bg-[#f7f7fb] p-2 sm:p-3 md:p-4">
+      <div className="min-h-[calc(100vh-1rem)] sm:min-h-[calc(100vh-1.5rem)] md:min-h-[calc(100vh-2rem)] bg-white rounded-[22px] sm:rounded-[28px] md:rounded-[32px] overflow-hidden flex items-center justify-center p-3 sm:p-4 md:p-8">
+        <div className="w-full max-w-md md:max-w-xl rounded-[20px] sm:rounded-[24px] md:rounded-[28px] bg-[#f6f7fb] p-3 sm:p-4 md:p-6">
+          <div className="rounded-[20px] sm:rounded-[24px] bg-white border border-gray-100 p-4 sm:p-6 md:p-8">
+            <div className="mb-5">
+              <h2 className="text-2xl sm:text-3xl font-semibold text-gray-900">Login</h2>
             </div>
 
-            <div className="flex flex-col my-4">
-              <label htmlFor="password" className="text-gray-700">
-                Password
-              </label>
-              <div className="relative flex items-center mt-2">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  id="password"
-                  className="flex-1 w-full p-2 pr-10 border border-gray-300 focus:outline-none focus:ring-0 focus:border-gray-300 rounded text-sm text-gray-900"
-                  placeholder="Enter your password"
-                />
-                
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-2 bg-transparent flex items-center justify-center text-gray-700"
+            {error && (
+              <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700 mb-2"
                 >
-                  {!showPassword ? (
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
-                      />
-                    </svg>
-                  ) : (
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                      />
-                    </svg>
-                  )}
-                </button>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between my-4">
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  name="remember_me"
-                  id="remember_me"
-                  className="mr-2 focus:ring-0 rounded"
-                />
-                <label htmlFor="remember_me" className="text-gray-700">
-                  Remember me
+                  Email
                 </label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  className="w-full rounded-2xl bg-[#f6f7fb] border border-transparent px-4 py-3 sm:py-4 outline-none focus:ring-2 focus:ring-gray-200"
+                  placeholder="Enter your email"
+                  required
+                />
               </div>
 
-              <a
-                href="#"
-                className="text-blue-600 hover:text-blue-700 hover:underline"
-              >
-                Forgot password?
-              </a>
-            </div>
+              <div>
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Password
+                </label>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  value={form.password}
+                  onChange={handleChange}
+                  className="w-full rounded-2xl bg-[#f6f7fb] border border-transparent px-4 py-3 sm:py-4 outline-none focus:ring-2 focus:ring-gray-200"
+                  placeholder="Enter your password"
+                  required
+                />
+              </div>
 
-            <div className="my-4 flex items-center justify-end">
               <button
                 type="submit"
-                className="bg-blue-600 hover:bg-blue-700 rounded-lg px-8 py-2 text-gray-100 hover:shadow-xl transition duration-150 uppercase"
+                disabled={loading}
+                className="w-full rounded-2xl bg-black text-white px-6 py-3 sm:py-4 text-sm font-medium hover:bg-gray-800 disabled:opacity-60"
               >
-                Sign In
+                {loading ? "Logging in..." : "Login"}
               </button>
-            </div>
-          </form>
+            </form>
 
-         
+            <p className="text-sm text-gray-500 text-center mt-5 sm:mt-6">
+              Do not have an account?{" "}
+              <Link to="/register" className="text-gray-900 font-medium hover:underline">
+                Register
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
-    </div>  
+    </div>
   );
 }
