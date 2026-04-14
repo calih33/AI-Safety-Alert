@@ -42,15 +42,16 @@ export default function LoginPage() {
         throw new Error(data.message || "Login failed");
       }
 
-      if (data.authorisation?.token) {
-        localStorage.setItem("token", data.authorisation.token);
+      const token = data.token;
+
+      if (!token || !data.user) {
+        throw new Error("Login response is missing token or user");
       }
 
-      if (data.user) {
-        localStorage.setItem("user", JSON.stringify(data.user));
-      }
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(data.user));
 
-      navigate("/dashboard");
+      navigate("/dashboard", { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to login");
     } finally {

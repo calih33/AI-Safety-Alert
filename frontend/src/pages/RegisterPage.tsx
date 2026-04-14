@@ -43,9 +43,11 @@ export default function RegisterPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          campus_id: form.campus_id,
           name: form.name,
           email: form.email,
           password: form.password,
+          password_confirmation: form.password_confirmation,
         }),
       });
 
@@ -55,23 +57,23 @@ export default function RegisterPage() {
         throw new Error(data.message || "Registration failed");
       }
 
-      if (data.authorisation?.token) {
-        localStorage.setItem("token", data.authorisation.token);
+      const token = data.token;
+      const user =
+        data.user ||
+        {
+          campus_id: form.campus_id,
+          name: form.name,
+          email: form.email,
+        };
+
+      if (!token) {
+        throw new Error("Registration response is missing token");
       }
 
-      if (data.user) {
-        localStorage.setItem("user", JSON.stringify(data.user));
-      } else {
-        localStorage.setItem(
-          "user",
-          JSON.stringify({
-            name: form.name,
-            email: form.email,
-          })
-        );
-      }
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
 
-      navigate("/dashboard");
+      navigate("/dashboard", { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to register");
     } finally {
