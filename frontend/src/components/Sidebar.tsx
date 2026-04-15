@@ -28,17 +28,6 @@ export default function Sidebar({
         </Link>
 
         <Link
-          to="/tickets"
-          className={`block rounded-2xl px-4 py-3 text-sm transition ${
-            activePage === "tickets"
-              ? "bg-white font-medium text-gray-900 shadow-sm"
-              : "text-gray-600 hover:bg-white/70"
-          }`}
-        >
-          My Tickets
-        </Link>
-
-        <Link
           to="/tickets/report"
           className={`block rounded-2xl px-4 py-3 text-sm transition ${
             activePage === "report"
@@ -68,7 +57,7 @@ export default function Sidebar({
       <aside className="hidden md:block w-72 shrink-0 bg-white rounded-[32px] border border-gray-100 p-6">
         <div className="mb-10">
           <div className="text-2xl font-bold text-gray-900 mt-3 ml-3">
-            Good Evening
+            Welcome Back
           </div>
           <p className="text-sm text-gray-500 mt-3 ml-3">{userName}</p>
         </div>
@@ -79,7 +68,7 @@ export default function Sidebar({
       <aside className="md:hidden fixed inset-0 z-50 bg-white p-5 overflow-y-auto">
         <div className="mb-10">
           <div className="text-2xl font-bold text-gray-900 mt-3 ml-3">
-            Good Evening
+            Welcome Back
           </div>
           <p className="text-sm text-gray-500 mt-3 ml-3">{userName}</p>
         </div>
