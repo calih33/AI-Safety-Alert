@@ -10,14 +10,14 @@ export default function TicketStatusBadge({ status }: TicketStatusProps) {
   };
 
   const classMap = {
-    "needs-attention": "bg-gray-100 text-gray-800 border border-gray-300",
-    "in-progress": "bg-gray-200 text-gray-900 border border-gray-300",
-    resolved: "bg-gray-50 text-gray-700 border border-gray-300",
+    "needs-attention": "bg-red-100 text-red-800 border border-red-200",
+    "in-progress": "bg-yellow-100 text-yellow-800 border border-yellow-200",
+    resolved: "bg-green-100 text-green-800 border border-green-200",
   };
 
   return (
     <span className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${classMap[status]}`}>
       {labelMap[status]}
-    </span> 
+    </span>
   );
 }

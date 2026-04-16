@@ -1,77 +1,59 @@
-import { Menu, UserCircle } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Menu, UserCircle, Bell, X } from "lucide-react";
+import { Link } from "react-router-dom";
+import { fetchNotifications } from "../services/notifications";
 
-interface NavbarProps {
-  appName?: string;
-  onMenuClick?: () => void;
-  isSidebarOpen?: boolean;
-}
+export default function Navbar({ appName = "Campus Ticketing System", onMenuClick, isSidebarOpen = false }: any) {
+  const [notifications, setNotifications] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
 
-export default function Navbar({
-  appName = "Campus Ticketing System",
-  onMenuClick,
-  isSidebarOpen = false,
-}: NavbarProps) {
+  useEffect(() => {
+    fetchNotifications().then(setNotifications).catch(console.error);
+  }, []);
+
+  const unreadCount = notifications.filter((n: any) => !n.is_read).length;
+
   return (
-    <>
-      {/* Desktop navbar */}
-      <header className="hidden md:block h-16 bg-white relative">
-        <div className="h-full flex items-center justify-between px-4">
-          <button
-            type="button"
-            onClick={onMenuClick}
-            aria-label={isSidebarOpen ? "Close menu" : "Open menu"}
-            className={[
-              "p-2 rounded-full hover:bg-gray-100 transition-all duration-300 z-[80]",
-              isSidebarOpen
-                ? "fixed top-12 left-[250px] bg-white"
-                : "relative",
-            ].join(" ")}
-          >
-            <Menu className="w-6 h-6 text-gray-700" />
-          </button>
+    <header className="h-16 bg-white flex items-center justify-between px-4 relative z-40 border-b border-gray-100 rounded-t-[32px]">
+      <div className="flex items-center gap-4">
+        <button onClick={onMenuClick} className="p-2 hover:bg-gray-100 rounded-full">
+          <Menu className="w-6 h-6 text-gray-700" />
+        </button>
+        <h1 className="text-lg font-semibold text-gray-900">{appName}</h1>
+      </div>
 
-          <h1 className="text-lg font-semibold text-gray-900">{appName}</h1>
+      <div className="flex items-center gap-2 relative">
+        <button onClick={() => setShowDropdown(!showDropdown)} className="relative p-2 rounded-full hover:bg-gray-100">
+          <Bell className="w-6 h-6 text-gray-700" />
+          {unreadCount > 0 && (
+            <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+          )}
+        </button>
 
-          <button
-            type="button"
-            className="p-2 rounded-full hover:bg-gray-100"
-            aria-label="Profile"
-          >
-            <UserCircle className="w-7 h-7 text-gray-700" />
-          </button>
-        </div>
-      </header>
+        {showDropdown && (
+          <div className="absolute top-12 right-0 w-80 bg-white border border-gray-100 shadow-xl rounded-2xl p-4 animate-in fade-in zoom-in duration-200">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-bold text-gray-900 text-sm">Notifications</h3>
+              <button onClick={() => setShowDropdown(false)}><X className="w-4 h-4 text-gray-400" /></button>
+            </div>
+            <div className="space-y-2 max-h-60 overflow-y-auto">
+              {notifications.length === 0 ? (
+                <p className="text-xs text-gray-400 italic text-center py-4">All clear.</p>
+              ) : (
+                notifications.map((n: any) => (
+                  <div key={n.id} className={`p-3 rounded-xl text-[11px] ${n.is_read ? 'bg-gray-50' : 'bg-blue-50 border border-blue-100'}`}>
+                    {n.message}
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        )}
 
-      {/* Mobile navbar */}
-      <header className="md:hidden h-16 bg-white relative">
-        <div className="h-full grid grid-cols-[48px_1fr_48px] items-center px-3 gap-2">
-          <button
-            type="button"
-            onClick={onMenuClick}
-            aria-label={isSidebarOpen ? "Close menu" : "Open menu"}
-            className={[
-              "p-2 rounded-full hover:bg-gray-100 transition-all duration-300 z-[80]",
-              isSidebarOpen
-                ? "fixed top-5 left-[325px] bg-white"
-                : "relative",
-            ].join(" ")}
-          >
-            <Menu className="w-6 h-6 text-gray-700" />
-          </button>
-
-          <h1 className="text-sm font-semibold text-gray-900 text-center truncate">
-            {appName}
-          </h1>
-
-          <button
-            type="button"
-            className="p-2 rounded-full hover:bg-gray-100 justify-self-end"
-            aria-label="Profile"
-          >
-            <UserCircle className="w-7 h-7 text-gray-700" />
-          </button>
-        </div>
-      </header>
-    </>
+        <Link to="/settings" className="p-2 rounded-full hover:bg-gray-100">
+          <UserCircle className="w-7 h-7 text-gray-700" />
+        </Link>
+      </div>
+    </header>
   );
-} 
+}
