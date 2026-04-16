@@ -34,11 +34,9 @@ class Ticket extends Model
     {
         return $this->belongsTo(Department::class);
     }
-    // app/Models/Ticket.php
 
     public function assignedStaff(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
-        // Arguments: RelatedModel, table_name, foreign_key_for_this_model, foreign_key_for_other_model
         return $this->belongsToMany(
             Staff::class,
             'staff_assignments',

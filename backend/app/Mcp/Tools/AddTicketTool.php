@@ -13,7 +13,7 @@ use Laravel\Mcp\Server\Tool;
 #[Description("Add a ticket item to the database. It takes user_id, location_id, title, and content as parameters.")]
 class AddTicketTool extends Tool {
     public function handle(Request $request): Response {
-        $validated = $request->validate( 
+        $validated = $request->validate(
             [
                 'user_id' => 'required|integer',
                 'location_id' => 'required|integer',

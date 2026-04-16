@@ -1,5 +1,18 @@
+import { getApiBase } from "./api";
 
-const API_BASE = "http://127.0.0.1:8000/api";
+const API_BASE = getApiBase();
+
+type CreateTicketInput = {
+  title: string;
+  content: string;
+  location_id: number;
+};
+
+type UpdateTicketInput = {
+  title?: string;
+  content?: string;
+  status?: "needs-attention" | "in-progress" | "resolved";
+};
 
 function getAuthHeaders() {
   const token = localStorage.getItem("token");
@@ -12,15 +25,9 @@ function getAuthHeaders() {
 }
 
 export async function fetchTickets() {
-  const token = localStorage.getItem("token");
-
-  const response = await fetch("http://127.0.0.1:8000/api/tickets", {
+  const response = await fetch(`${API_BASE}/tickets`, {
     method: "GET",
-    headers: {
-      "Accept": "application/json",
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,
-    },
+    headers: getAuthHeaders(),
   });
 
   if (!response.ok) {
@@ -30,8 +37,8 @@ export async function fetchTickets() {
   return response.json();
 }
 
-export async function createTicket(payload: any) {
-  const dbPayload = {
+export async function createTicket(payload: CreateTicketInput) {
+  const requestBody = {
     title: payload.title,
     content: payload.content,
     location: payload.location_id === 1 ? "SW1 100" :
@@ -41,10 +48,36 @@ export async function createTicket(payload: any) {
   const response = await fetch(`${API_BASE}/tickets`, {
     method: "POST",
     headers: getAuthHeaders(),
-    body: JSON.stringify(dbPayload),
+    body: JSON.stringify(requestBody),
   });
 
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || "Failed to create ticket");
+  return data;
+}
+
+export async function updateTicket(
+  ticketId: number,
+  payload: UpdateTicketInput
+) {
+  const response = await fetch(`${API_BASE}/tickets/${ticketId}`, {
+    method: "PATCH",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(payload),
+  });
+
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || "Failed to update ticket");
+  return data;
+}
+
+export async function deleteTicket(ticketId: number) {
+  const response = await fetch(`${API_BASE}/tickets/${ticketId}`, {
+    method: "DELETE",
+    headers: getAuthHeaders(),
+  });
+
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || "Failed to delete ticket");
   return data;
 }

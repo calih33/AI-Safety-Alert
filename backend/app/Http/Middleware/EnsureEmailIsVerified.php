@@ -9,11 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class EnsureEmailIsVerified
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  Closure(Request): (Response)  $next
-     */
+
     public function handle(Request $request, Closure $next): Response
     {
         if (! $request->user() ||

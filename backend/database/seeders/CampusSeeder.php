@@ -14,11 +14,9 @@ class CampusSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Create/Find Locations
         $sw1 = Location::firstOrCreate(['building_prefix' => 'SW1', 'room_number' => '100']);
         $ne1 = Location::firstOrCreate(['building_prefix' => 'NE1', 'room_number' => '200']);
 
-        // 2. Create/Find Departments
         $security = Department::firstOrCreate(
             ['name' => 'Security'],
             [
@@ -36,7 +34,33 @@ class CampusSeeder extends Seeder
             ]
         );
 
-        // 3. Create/Find Test Admin
+        $it = Department::firstOrCreate(
+            ['name' => 'IT Support'],
+            [
+                'email' => 'itsupport@bcit.ca',
+                'location_id' => $sw1->id,
+                'phone' => '604-555-0110',
+            ]
+        );
+
+        $facilities = Department::firstOrCreate(
+            ['name' => 'Facilities'],
+            [
+                'email' => 'facilities@bcit.ca',
+                'location_id' => $ne1->id,
+                'phone' => '604-555-0140',
+            ]
+        );
+
+        $custodial = Department::firstOrCreate(
+            ['name' => 'Custodial'],
+            [
+                'email' => 'custodial@bcit.ca',
+                'location_id' => $sw1->id,
+                'phone' => '604-555-0160',
+            ]
+        );
+
         $adminCali = User::firstOrCreate(
             ['campus_id' => 'A00000001'],
             [
@@ -47,7 +71,6 @@ class CampusSeeder extends Seeder
             ]
         );
 
-        // 4. Create/Find Test Staff
         $staffUser = User::firstOrCreate(
             ['campus_id' => 'A00000002'],
             [
@@ -58,7 +81,6 @@ class CampusSeeder extends Seeder
             ]
         );
 
-        // 5. Link Staff Subtype
         Staff::firstOrCreate(
             ['user_id' => $staffUser->id],
             [
@@ -68,7 +90,6 @@ class CampusSeeder extends Seeder
             ]
         );
 
-        // 6. Create Demo Ticket (Use updateOrCreate so it doesn't duplicate)
         Ticket::updateOrCreate(
             ['title' => 'Exploding Lab Equipment'],
             [

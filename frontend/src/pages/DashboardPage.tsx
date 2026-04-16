@@ -1,27 +1,22 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
   Search,
-  MapPin,
   ShieldAlert,
   Clock3,
   Building2,
   FileText
-} from "lucide-react"; // Added icons for the card layout
+} from "lucide-react";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import type { Ticket } from "../types/tickets";
 import { fetchTickets } from "../services/tickets";
 
 export default function DashboardPage() {
-  const navigate = useNavigate();
-
-  // 1. Real State: Stores the physical reports from your database
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [isMenuOpen, setIsMenuOpen] = useState(true);
-  const [search, setSearch] = useState(""); // Search state from the structure you liked
+  const [search, setSearch] = useState("");
 
-  // 2. Fetch Logic: Keeps the page protected and loads real data
   useEffect(() => {
     const load = async () => {
       try {
@@ -43,7 +38,6 @@ export default function DashboardPage() {
     } catch { return "Student"; }
   })();
 
-  // 3. The Filter Engine: Searches real titles, content, and departments
   const filteredTickets = useMemo(() => {
     const term = search.trim().toLowerCase();
     if (!term) return tickets;
@@ -70,7 +64,6 @@ export default function DashboardPage() {
     setIsMenuOpen((prev) => !prev);
   }
 
-  // 4. Visual Helpers: For the grounded, physical look of the cards
   function getStatusClasses(status: Ticket["status"]) {
     switch (status) {
       case "needs-attention": return "bg-red-100 text-red-700 border-red-200";
@@ -109,7 +102,6 @@ export default function DashboardPage() {
                 </Link>
               </div>
 
-              {/* Stat cards section */}
               <div className="rounded-[28px] bg-[#f6f7fb] p-4 lg:p-6 mb-6">
                 <h2 className="text-3xl font-semibold text-gray-900 mb-5">Dashboard</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-4 gap-4">
@@ -132,7 +124,7 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {/* 5. The Card Structure: Real Data Card Display */}
+              { }
               <div className="rounded-[28px] bg-[#f6f7fb] p-4 lg:p-6">
                 <h3 className="text-2xl font-semibold text-gray-900 mb-4">Your Recent Reports</h3>
 
@@ -178,7 +170,7 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
-      {/* Note: Ensure your mobile view (hidden in this snippet) follows this same filteredTickets.map logic */}
+      { }
     </div>
   );
 }

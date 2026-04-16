@@ -10,7 +10,11 @@ export interface Ticket {
     id: number;
     name: string;
   };
-  // The new physical audit log
+  location?: {
+    id: number;
+    building_prefix: string;
+    room_number: string;
+  };
   history?: {
     id: number;
     old_status: string;

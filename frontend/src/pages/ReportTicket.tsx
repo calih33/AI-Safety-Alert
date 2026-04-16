@@ -82,7 +82,7 @@ export default function ReportTicket() {
 
   return (
     <div className="min-h-screen bg-[#f7f7fb]">
-      {/* DESKTOP VIEW*/}
+      {}
       <div className="hidden md:flex min-h-screen p-4 gap-4">
         <Sidebar
           userName={userName}

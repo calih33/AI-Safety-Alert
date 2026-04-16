@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Ticket;
 use App\Models\Department;
+use App\Models\TicketHistory;
+use App\Notifications\TicketStatusUpdatedNotification;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -13,7 +15,6 @@ class DashboardController extends Controller
     {
         $query = Ticket::with(['user', 'location', 'department']);
 
-        // Basic Filtering Logic 
         if ($request->has('department') && $request->department != '') {
             $query->where('department_id', $request->department);
         }
@@ -30,7 +31,6 @@ class DashboardController extends Controller
 
     public function show(Ticket $ticket)
     {
-        // Load relationships so we can see the location, user, and assigned staff
         $ticket->load(['user', 'location', 'department', 'assignedStaff', 'history']);
 
         return view('admin.show', compact('ticket'));
@@ -43,6 +43,8 @@ class DashboardController extends Controller
             'priority' => ['required', 'integer', 'in:1,2,3'],
         ]);
 
+        $adminUserId = $request->user()?->id ?? $ticket->user_id;
+
         $oldStatus = $ticket->status;
         $newStatus = $validated['status'];
         $oldPriority = (int) $ticket->priority;
@@ -54,19 +56,26 @@ class DashboardController extends Controller
         ]);
 
         if ($oldStatus !== $newStatus) {
-            \App\Models\TicketHistory::create([
+            TicketHistory::create([
                 'ticket_id' => $ticket->id,
-                'user_id' => 1,
+                'user_id' => $adminUserId,
                 'old_status' => $oldStatus,
                 'new_status' => $newStatus,
                 'comment' => 'Status manually updated via Admin Dashboard.'
             ]);
+
+            $ticket->user?->notify(new TicketStatusUpdatedNotification(
+                $ticket,
+                $oldStatus,
+                $newStatus,
+                $request->user()?->name,
+            ));
         }
 
         if ($oldPriority !== $newPriority) {
-            \App\Models\TicketHistory::create([
+            TicketHistory::create([
                 'ticket_id' => $ticket->id,
-                'user_id' => 1,
+                'user_id' => $adminUserId,
                 'old_status' => $newStatus,
                 'new_status' => $newStatus,
                 'comment' => "Priority changed from {$oldPriority} to {$newPriority}."
@@ -74,5 +83,12 @@ class DashboardController extends Controller
         }
 
         return back()->with('success', 'Ticket status and priority updated.');
+    }
+
+    public function destroy(Ticket $ticket)
+    {
+        $ticket->delete();
+
+        return redirect()->route('admin.dashboard')->with('success', 'Ticket deleted successfully.');
     }
 }

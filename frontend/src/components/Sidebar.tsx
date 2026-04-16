@@ -86,7 +86,7 @@ export default function Sidebar({
           Settings
         </Link>
 
-        {/* --- ADMIN BRIDGE --- */}
+        {}
         {isAdmin && (
           <>
             <div className="h-px bg-gray-200/60 my-2 mx-4"></div>
@@ -100,7 +100,7 @@ export default function Sidebar({
           </>
         )}
 
-        {/* --- LOGOUT BUTTON --- */}
+        {}
         <div className={`h-px bg-gray-200/60 mx-4 ${isAdmin ? 'my-1' : 'my-2'}`}></div>
         <button
           onClick={handleLogout}
@@ -115,7 +115,7 @@ export default function Sidebar({
 
   return (
     <>
-      {/* Desktop view */}
+      {}
       <aside className="hidden md:flex flex-col w-[280px] shrink-0 bg-white rounded-[32px] border border-gray-100 p-5 shadow-sm">
         <div className="mb-6 px-4 pt-4">
           <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Campus Portal</p>
@@ -126,7 +126,7 @@ export default function Sidebar({
         {renderLinks()}
       </aside>
 
-      {/* Mobile overlay */}
+      {}
       <aside className="md:hidden fixed inset-0 z-50 bg-white p-5 overflow-y-auto">
         <div className="mb-8 px-4 pt-8">
           <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Campus Portal</p>

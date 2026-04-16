@@ -1,29 +1,57 @@
 import { useState, useEffect } from "react";
 import { Menu, UserCircle, Bell, X } from "lucide-react";
 import { Link } from "react-router-dom";
-import { fetchNotifications } from "../services/notifications";
+import { fetchNotifications, markAllNotificationsRead } from "../services/notifications";
+
+interface NotificationItem {
+  id: string;
+  read_at: string | null;
+  message?: string;
+  data?: {
+    message?: string;
+  };
+}
 
 export default function Navbar({ appName = "Campus Ticketing System", onMenuClick, isSidebarOpen = false }: any) {
-  const [notifications, setNotifications] = useState([]);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
 
   useEffect(() => {
     fetchNotifications().then(setNotifications).catch(console.error);
   }, []);
 
-  const unreadCount = notifications.filter((n: any) => !n.is_read).length;
+  async function handleBellClick() {
+    const nextOpen = !showDropdown;
+    setShowDropdown(nextOpen);
+
+    if (!showDropdown && notifications.some((n: any) => !n.read_at)) {
+      setNotifications((current: any[]) => current.map((notification) => ({
+        ...notification,
+        read_at: notification.read_at ?? new Date().toISOString(),
+      })));
+
+      try {
+        await markAllNotificationsRead();
+      } catch (error) {
+        console.error(error);
+        fetchNotifications().then(setNotifications).catch(console.error);
+      }
+    }
+  }
+
+  const unreadCount = notifications.filter((n: any) => !n.read_at).length;
 
   return (
     <header className="h-16 bg-white flex items-center justify-between px-4 relative z-40 border-b border-gray-100 rounded-t-[32px]">
       <div className="flex items-center gap-4">
-        <button onClick={onMenuClick} className="p-2 hover:bg-gray-100 rounded-full">
+        <button onClick={onMenuClick} aria-expanded={isSidebarOpen} className="p-2 hover:bg-gray-100 rounded-full">
           <Menu className="w-6 h-6 text-gray-700" />
         </button>
         <h1 className="text-lg font-semibold text-gray-900">{appName}</h1>
       </div>
 
       <div className="flex items-center gap-2 relative">
-        <button onClick={() => setShowDropdown(!showDropdown)} className="relative p-2 rounded-full hover:bg-gray-100">
+        <button onClick={handleBellClick} className="relative p-2 rounded-full hover:bg-gray-100">
           <Bell className="w-6 h-6 text-gray-700" />
           {unreadCount > 0 && (
             <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
@@ -41,8 +69,8 @@ export default function Navbar({ appName = "Campus Ticketing System", onMenuClic
                 <p className="text-xs text-gray-400 italic text-center py-4">All clear.</p>
               ) : (
                 notifications.map((n: any) => (
-                  <div key={n.id} className={`p-3 rounded-xl text-[11px] ${n.is_read ? 'bg-gray-50' : 'bg-blue-50 border border-blue-100'}`}>
-                    {n.message}
+                  <div key={n.id} className={`p-3 rounded-xl text-[11px] ${n.read_at ? 'bg-gray-50' : 'bg-blue-50 border border-blue-100'}`}>
+                    {n.message || n.data?.message || "Notification"}
                   </div>
                 ))
               )}
