@@ -17,33 +17,25 @@ class Staff extends Model
         'phone',
     ];
 
-    /**
-     * This links the staff record back to the login/auth info.
-     */
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Links to the Medical, Security, or Janitorial entries.
-     */
+
     public function department(): BelongsTo
     {
         return $this->belongsTo(Department::class);
     }
 
-    /**
-     * Where the staff member is usually stationed.
-     */
+
     public function location(): BelongsTo
     {
         return $this->belongsTo(Location::class);
     }
 
-    /**
-     * Relationship is to assign tickets
-     */
+
     public function assignedTickets(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(Ticket::class, 'staff_assignments', 'user_id', 'ticket_id')

@@ -25,19 +25,13 @@ class User extends Authenticatable
         ];
     }
 
-    /**
-     * Relationship: Staff Subtype
-     * Only users with type='staff' will have a record here.
-     */
+
     public function staff(): HasOne
     {
         return $this->hasOne(Staff::class);
     }
 
-    /**
-     * Relationship: Tickets Reported
-     * Allows us to do $user->tickets to see everything a student reported.
-     */
+
     public function tickets(): HasMany
     {
         return $this->hasMany(Ticket::class);

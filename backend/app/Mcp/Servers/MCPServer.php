@@ -18,10 +18,8 @@ class MCPServer extends Server
     ];
 
     protected array $resources = [
-        //
     ];
 
     protected array $prompts = [
-        //
     ];
 }
