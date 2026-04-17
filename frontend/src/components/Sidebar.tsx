@@ -45,8 +45,8 @@ export default function Sidebar({
         <Link
           to="/dashboard"
           className={`flex items-center gap-3 rounded-2xl px-4 py-3 text-sm transition-all duration-200 ${activePage === "dashboard"
-              ? "bg-white font-medium text-gray-900 shadow-sm"
-              : "text-gray-500 hover:bg-white/60 hover:text-gray-900"
+            ? "bg-white font-medium text-gray-900 shadow-sm"
+            : "text-gray-500 hover:bg-white/60 hover:text-gray-900"
             }`}
         >
           <LayoutDashboard className={`w-5 h-5 ${activePage === 'dashboard' ? 'text-gray-900' : 'text-gray-400'}`} />
@@ -56,8 +56,8 @@ export default function Sidebar({
         <Link
           to="/tickets"
           className={`flex items-center gap-3 rounded-2xl px-4 py-3 text-sm transition-all duration-200 ${activePage === "tickets"
-              ? "bg-white font-medium text-gray-900 shadow-sm"
-              : "text-gray-500 hover:bg-white/60 hover:text-gray-900"
+            ? "bg-white font-medium text-gray-900 shadow-sm"
+            : "text-gray-500 hover:bg-white/60 hover:text-gray-900"
             }`}
         >
           <Ticket className={`w-5 h-5 ${activePage === 'tickets' ? 'text-gray-900' : 'text-gray-400'}`} />
@@ -67,8 +67,8 @@ export default function Sidebar({
         <Link
           to="/tickets/report"
           className={`flex items-center gap-3 rounded-2xl px-4 py-3 text-sm transition-all duration-200 ${activePage === "report"
-              ? "bg-white font-medium text-gray-900 shadow-sm"
-              : "text-gray-500 hover:bg-white/60 hover:text-gray-900"
+            ? "bg-white font-medium text-gray-900 shadow-sm"
+            : "text-gray-500 hover:bg-white/60 hover:text-gray-900"
             }`}
         >
           <FilePlus className={`w-5 h-5 ${activePage === 'report' ? 'text-gray-900' : 'text-gray-400'}`} />
@@ -78,20 +78,20 @@ export default function Sidebar({
         <Link
           to="/settings"
           className={`flex items-center gap-3 rounded-2xl px-4 py-3 text-sm transition-all duration-200 ${activePage === "settings"
-              ? "bg-white font-medium text-gray-900 shadow-sm"
-              : "text-gray-500 hover:bg-white/60 hover:text-gray-900"
+            ? "bg-white font-medium text-gray-900 shadow-sm"
+            : "text-gray-500 hover:bg-white/60 hover:text-gray-900"
             }`}
         >
           <Settings className={`w-5 h-5 ${activePage === 'settings' ? 'text-gray-900' : 'text-gray-400'}`} />
           Settings
         </Link>
 
-        {}
+        { }
         {isAdmin && (
           <>
             <div className="h-px bg-gray-200/60 my-2 mx-4"></div>
             <a
-              href="http://127.0.0.1:8000/admin/dashboard"
+              href="https://ai-safety-app-dxdbcyd7abg6d8cx.westus3-01.azurewebsites.net/admin/dashboard"
               className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
             >
               <ShieldAlert className="w-5 h-5 text-red-500" />
@@ -100,7 +100,7 @@ export default function Sidebar({
           </>
         )}
 
-        {}
+        { }
         <div className={`h-px bg-gray-200/60 mx-4 ${isAdmin ? 'my-1' : 'my-2'}`}></div>
         <button
           onClick={handleLogout}
@@ -115,7 +115,7 @@ export default function Sidebar({
 
   return (
     <>
-      {}
+      { }
       <aside className="hidden md:flex flex-col w-[280px] shrink-0 bg-white rounded-[32px] border border-gray-100 p-5 shadow-sm">
         <div className="mb-6 px-4 pt-4">
           <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Campus Portal</p>
@@ -126,7 +126,7 @@ export default function Sidebar({
         {renderLinks()}
       </aside>
 
-      {}
+      { }
       <aside className="md:hidden fixed inset-0 z-50 bg-white p-5 overflow-y-auto">
         <div className="mb-8 px-4 pt-8">
           <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Campus Portal</p>
