@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { getApiBase } from "../services/api";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -27,7 +28,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/login", {
+      const response = await fetch(`${getApiBase()}/login`, {
         method: "POST",
         headers: {
           Accept: "application/json",

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { getApiBase } from "../services/api";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -36,7 +37,7 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/register", {
+      const response = await fetch(`${getApiBase()}/register`, {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -97,7 +98,7 @@ export default function RegisterPage() {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
-                <div>
+              <div>
                 <label
                   htmlFor="name"
                   className="block text-sm font-medium text-gray-700 mb-2"

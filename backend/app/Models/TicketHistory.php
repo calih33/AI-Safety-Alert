@@ -17,17 +17,13 @@ class TicketHistory extends Model
         'comment'
     ];
 
-    /**
-     * The ticket this history record belongs to.
-     */
+
     public function ticket(): BelongsTo
     {
         return $this->belongsTo(Ticket::class);
     }
 
-    /**
-     * The person (Admin or Staff) who made the status change.
-     */
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

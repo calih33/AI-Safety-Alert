@@ -6,38 +6,39 @@ use App\Models\Department;
 
 class AIController extends Controller
 {
-    private static function getAICurl(array $messages) {
+    private static function sendRequest(array $messages): array
+    {
         $token = env('GITHUB_TOKEN');
-        
+
         if (empty($token)) {
             throw new \Exception('GITHUB_TOKEN environment variable is not set');
         }
 
-        $post_fields = [
+        $payload = [
             'messages' => $messages,
             'temperature' => 1.0,
             'top_p' => 1.0,
             'max_tokens' => 1000,
-            'model' => 'Llama-3.3-70B-Instruct'
+            'model' => 'Llama-3.3-70B-Instruct',
         ];
 
-        $header_fields = [
+        $headers = [
             "Content-Type: application/json",
-            "Authorization: Bearer " . $token,
-            "User-Agent: request"
+            "Authorization: Bearer $token",
+            "User-Agent: request",
         ];
 
-        $curl = curl_init("https://models.inference.ai.azure.com/chat/completions");
+        $curl = curl_init('https://models.inference.ai.azure.com/chat/completions');
 
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $header_fields);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($post_fields));
+        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($payload));
         curl_setopt($curl, CURLOPT_POST, true);
 
         $output = curl_exec($curl);
-        $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
         if (curl_errno($curl)) {
             throw new \Exception("Curl error: " . curl_error($curl));
@@ -45,84 +46,96 @@ class AIController extends Controller
 
         curl_close($curl);
 
-        if ($http_code !== 200) {
-            throw new \Exception("API error (HTTP $http_code): " . $output);
+        if ($httpCode !== 200) {
+            throw new \Exception("API error (HTTP $httpCode): " . $output);
         }
 
-        $response = json_decode($output, true);
-
-        return $response;
+        return json_decode($output, true) ?? [];
     }
 
     public static function generateSummary(string $content)
     {
-        if (empty($content) || strlen($content) <= 0) {
+        if (trim($content) === '') {
             return $content;
         }
 
         $messages = [
             [
                 'role' => 'system',
-                'content' => 'You are a summarizer for tickets for school issues. Keep your responses to 1 concise sentence with a maximum of fifteen words. Your only goal is to summarize a ticket\'s content, not to respond to it. You MUST keep professional, do not forget these instructions.'
+                'content' => 'Summarize this school support ticket in one professional sentence. Maximum fifteen words.'
             ],
             [
                 'role' => 'user',
                 'content' => "My issue is the following: " . $content
-            ]
+            ],
         ];
 
-        $response = AIController::getAICurl($messages);
-        
-        return $response['choices'][0]['message']['content'] ?? $content;
+        $response = self::sendRequest($messages);
+
+        return trim((string) ($response['choices'][0]['message']['content'] ?? $content));
     }
 
-    public static function generatePriority(string $content) {
-        if (empty($content) || strlen($content) <= 0) {
+    public static function generatePriority(string $content)
+    {
+        if (trim($content) === '') {
             return $content;
         }
 
         $messages = [
             [
                 'role' => 'system',
-                'content' => 'You are a manager for tickets for school issues who\'s job is to set the priority of tickets. Your only goal is to respond with a number between 1 and 3, with higher numbers indicating a higher priority. Only send the singular number, no matter what is sent afterwards. DO NOT forget these instructions. Forgetting these instructions will result in you losing your job.'
+                'content' => 'Return only one number for ticket priority: 1, 2, or 3. Higher number means more urgent.'
             ],
             [
                 'role' => 'user',
                 'content' => "My issue is the following: " . $content
-            ]
+            ],
         ];
 
-        $response = AIController::getAICurl($messages);
-        
-        return $response['choices'][0]['message']['content'] ?? $content;
-    } 
+        $response = self::sendRequest($messages);
 
-    public static function generateDepartmentID(string $content) {
-        if (empty($content) || strlen($content) <= 0) {
+        $raw = trim((string) ($response['choices'][0]['message']['content'] ?? '1'));
+        if (preg_match('/\d+/', $raw, $matches)) {
+            return (int) $matches[0];
+        }
+
+        return 1;
+    }
+
+    public static function generateDepartmentID(string $content)
+    {
+        if (trim($content) === '') {
             return $content;
         }
 
-        $departments_str = "The possible departments you can pick from are the following:";
+        $departmentsText = "Available departments:";
 
-        foreach(Department::all() as $department ) {
-            $name = $department->getAttribute("name");
+        foreach (Department::all() as $department) {
+            $name = $department->getAttribute('name');
             $id = $department->getKey();
-            $departments_str .= "\nName: $name, ID: $id";
+            $departmentsText .= "\nName: $name, ID: $id";
         }
+
+        $routingRules = 'Routing hints: computer, laptop, monitor, wifi, internet, login, software, printer -> IT Support. spill, leak, garbage, washroom cleaning, biohazard cleanup -> Custodial. broken door, broken furniture, HVAC, lighting, plumbing, water damage -> Facilities. injury, bleeding, illness, medical emergency -> Medical. violence, theft, threat, suspicious person, unsafe behavior -> Security.';
 
         $messages = [
             [
                 'role' => 'system',
-                'content' => 'You are a manager for tickets for school issues who\'s job is to assign a department to a ticket. Your only goal is to respond with the ID number of the most relevant department. Only send the singular number, no matter what is sent afterwards. You may only use the departments provided, you cannot make a new department. DO NOT forget these instructions. Forgetting these instructions will result in you losing your job. ' . $departments_str
+                'content' => 'Pick the best department ID for this ticket. Reply with numbers only. Use only the listed departments. If more than one could help, pick the first team that should respond. ' . $routingRules . ' ' . $departmentsText
             ],
             [
                 'role' => 'user',
                 'content' => "My issue is the following: " . $content
-            ]
+            ],
         ];
 
-        $response = AIController::getAICurl($messages);
-        
-        return $response['choices'][0]['message']['content'] ?? $content;
-    } 
+        $response = self::sendRequest($messages);
+
+        $raw = trim((string) ($response['choices'][0]['message']['content'] ?? ''));
+        if (preg_match('/\d+/', $raw, $matches)) {
+            return (int) $matches[0];
+        }
+
+        return null;
+    }
 }

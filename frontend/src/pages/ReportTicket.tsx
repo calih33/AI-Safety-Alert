@@ -7,23 +7,18 @@ import { createTicket } from "../services/tickets";
 export default function ReportTicket() {
   const navigate = useNavigate();
 
-  // Form fields for creating a new ticket
   const [form, setForm] = useState({
     title: "",
     location: "",
     content: "",
   });
 
-  // Loading state while submitting the form
   const [loading, setLoading] = useState(false);
 
-  // Error message shown if ticket creation fails
   const [error, setError] = useState("");
 
-  // Controls whether the sidebar is open or closed
   const [isMenuOpen, setIsMenuOpen] = useState(true);
 
-  // Protects the page so only logged in users can access it
   useEffect(() => {
     const token = localStorage.getItem("token");
     const storedUser = localStorage.getItem("user");
@@ -33,7 +28,6 @@ export default function ReportTicket() {
     }
   }, [navigate]);
 
-  // Gets the logged in user's name from localStorage
   const userName = (() => {
     const storedUser = localStorage.getItem("user");
 
@@ -49,9 +43,8 @@ export default function ReportTicket() {
     }
   })();
 
-  // Updates form values when user types in inputs or textarea
   function handleChange(
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) {
     const { name, value } = e.target;
 
@@ -61,14 +54,20 @@ export default function ReportTicket() {
     }));
   }
 
-  // Handles ticket submission
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setLoading(true);
 
     try {
-      await createTicket(form);
+      const dbPayload = {
+        title: form.title,
+        content: form.content,
+        location_id: parseInt(form.location),
+      };
+
+      await createTicket(dbPayload as any);
+
       navigate("/dashboard", { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create ticket");
@@ -77,31 +76,22 @@ export default function ReportTicket() {
     }
   }
 
-  // Opens or closes the sidebar menu
   function toggleMenu() {
     setIsMenuOpen((prev) => !prev);
   }
 
-  // Closes the sidebar menu
-  function closeMenu() {
-    setIsMenuOpen(false);
-  }
-
   return (
     <div className="min-h-screen bg-[#f7f7fb]">
-      {/* DESKTOP VIEW*/}
+      {}
       <div className="hidden md:flex min-h-screen p-4 gap-4">
-        {/* Desktop sidebar */}
-                <Sidebar
-                userName={userName}
-                activePage="report"
-                isMenuOpen={isMenuOpen}
-              />
+        <Sidebar
+          userName={userName}
+          activePage="report"
+          isMenuOpen={isMenuOpen}
+        />
 
-        {/* Desktop main content area */}
         <div className="flex-1 min-w-0 bg-[#f7f7fb] rounded-[32px]">
           <div className="bg-white rounded-[32px] min-h-full p-5 lg:p-6">
-            {/* Navbar contains the hamburger menu button */}
             <Navbar
               appName="Campus Ticketing System"
               onMenuClick={toggleMenu}
@@ -109,7 +99,6 @@ export default function ReportTicket() {
             />
 
             <main className="pt-6">
-              {/* Report ticket content wrapper */}
               <div className="rounded-[28px] bg-[#f6f7fb] p-4 lg:p-6 min-h-[calc(100vh-10rem)]">
                 <div className="flex items-center justify-between mb-5">
                   <div>
@@ -129,21 +118,17 @@ export default function ReportTicket() {
                   </Link>
                 </div>
 
-                {/* Error message box */}
                 {error && (
                   <div className="mb-5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                     {error}
                   </div>
                 )}
 
-                {/* Desktop report ticket form */}
                 <form
                   onSubmit={handleSubmit}
                   className="rounded-[28px] bg-white border border-gray-100 p-6 lg:p-8 h-[calc(100%-5rem)] flex flex-col"
                 >
                   <div className="grid grid-cols-1 xl:grid-cols-2 gap-5 mb-5">
-
-                      {/* Title input */} 
                     <div>
                       <label
                         htmlFor="title"
@@ -163,28 +148,26 @@ export default function ReportTicket() {
                       />
                     </div>
 
-                    {/* Location input */}
                     <div>
-                      <label
-                        htmlFor="location"
-                        className="block text-sm font-medium text-gray-700 mb-2"
-                      >
+                      <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-2">
                         Location
                       </label>
-                      <input
+                      <select
                         id="location"
                         name="location"
-                        type="text"
                         value={form.location}
                         onChange={handleChange}
                         className="w-full rounded-2xl bg-[#f6f7fb] border border-transparent px-4 py-4 outline-none focus:ring-2 focus:ring-gray-200"
-                        placeholder="Example: SW1 101 or Building B Lobby"
                         required
-                      />
+                      >
+                        <option value="" disabled>Select a building...</option>
+                        <option value="1">SW1 - Main Building</option>
+                        <option value="2">SW2 - Applied Sciences</option>
+                        <option value="3">NE1 - Engineering</option>
+                      </select>
                     </div>
                   </div>
 
-                  {/* Description text area */}
                   <div className="flex-1 flex flex-col">
                     <label
                       htmlFor="content"
@@ -203,7 +186,6 @@ export default function ReportTicket() {
                     />
                   </div>
 
-                  {/* Submit button */}
                   <div className="flex justify-end mt-6">
                     <button
                       type="submit"
@@ -220,28 +202,23 @@ export default function ReportTicket() {
         </div>
       </div>
 
-      {/* MOBILE VIEW */}
       <div className="md:hidden min-h-screen flex flex-col relative p-3 bg-[#f7f7fb]">
         <div className="bg-white rounded-[28px] min-h-screen overflow-hidden">
-          {/* Navbar with hamburger menu button for mobile */}
           <Navbar
             appName="Campus Ticketing System"
             onMenuClick={toggleMenu}
             isSidebarOpen={isMenuOpen}
           />
 
-          {/* Mobile sidebar overlay */}
-           <Sidebar
+          <Sidebar
             userName={userName}
             activePage="report"
             isMenuOpen={isMenuOpen}
-          
+
           />
 
-          {/* Mobile main content */}
           <main className="p-4">
             <div className="rounded-[24px] bg-[#f6f7fb] p-4">
-              {/* Mobile heading and back button */}
               <div className="mb-5">
                 <p className="text-sm text-gray-500 mb-2">
                   Main <span className="mx-2">»</span> Report Ticket
@@ -260,19 +237,16 @@ export default function ReportTicket() {
                 </div>
               </div>
 
-              {/* Mobile error message box */}
               {error && (
                 <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                   {error}
                 </div>
               )}
 
-              {/* Mobile report ticket form */}
               <form
                 onSubmit={handleSubmit}
                 className="rounded-[24px] bg-white border border-gray-100 p-4 space-y-4"
               >
-                {/* Mobile title input */}
                 <div>
                   <label
                     htmlFor="title-mobile"
@@ -292,7 +266,6 @@ export default function ReportTicket() {
                   />
                 </div>
 
-                {/* Mobile location input */}
                 <div>
                   <label
                     htmlFor="location-mobile"
@@ -312,7 +285,6 @@ export default function ReportTicket() {
                   />
                 </div>
 
-                {/* Mobile description textarea */}
                 <div>
                   <label
                     htmlFor="content-mobile"
@@ -331,7 +303,6 @@ export default function ReportTicket() {
                   />
                 </div>
 
-                {/* Mobile submit button */}
                 <button
                   type="submit"
                   disabled={loading}
