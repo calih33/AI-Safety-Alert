@@ -8,8 +8,8 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => [env('FRONTEND_URL', 'http://localhost:5173')],
-
+    // Change it to look exactly like this:
+    'allowed_origins' => ['https://nice-cliff-0e0d9a70f.1.azurestaticapps.net'],
     'allowed_origins_patterns' => [],
 
     'allowed_headers' => ['*'],
