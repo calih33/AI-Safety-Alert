@@ -1,53 +1,69 @@
+# AI-Safety-Alert: Campus Hazard Reporting
 
+Team Members: Cali, Isaac, Daniel, and Justice
 
-<h2>BACKEND LAUNCHING</h2> 
+A full-stack application for reporting and managing campus safety hazards, integrated with an AI dispatcher.
 
+## Tech Stack
+
+- Frontend: React + Vite
+- Backend: Laravel (PHP 8.2+)
+- Database: SQLite (Physical file persistence)
+- Deployment: Azure App Service (Backend) & Static Web Apps (Frontend)
+
+## Local Development
+
+Follow these physical steps to get the environment breathing on your local machine.
+
+### Backend Setup
+
+Bash
+
+```bash
 cd backend
-
 composer install
-
 cp .env.example .env
-
 php artisan key:generate
-
 touch database/database.sqlite
-
 php artisan migrate:refresh --seed
-
 php artisan serve
+```
 
-<h2>FRONTEND LAUNCHING</h2>
+### Frontend Setup
 
+Bash
+
+```bash
 cd frontend
-
 npm install
-
 npm run dev
+```
 
-<h2>AZURE DEPLOYMENT</h2>
+## Azure Deployment Configuration
 
-<p>Use these environment values when deploying:</p>
+The physical connection between the two services requires these exact environment variables.
 
-<ul>
-<li><strong>Backend</strong>: APP_NAME, APP_ENV, APP_KEY, APP_DEBUG=false, APP_URL, DB_CONNECTION, DB_DATABASE, DB_HOST, DB_USERNAME, DB_PASSWORD, GITHUB_TOKEN, SANCTUM_STATEFUL_DOMAINS</li>
-<li><strong>Frontend</strong>: VITE_API_BASE_URL=https://your-backend-domain/api</li>
-</ul>
+### Backend App Service
 
-<p>Deployment flow:</p>
+Set these in Settings > Configuration:
 
-<ol>
-<li>Deploy Laravel backend to Azure App Service.</li>
-<li>Set the backend environment variables in Azure App Settings.</li>
-<li>Deploy the Vite React frontend to Azure Static Web Apps or a second App Service.</li>
-<li>Point <code>VITE_API_BASE_URL</code> at the live backend URL.</li>
-<li>Verify login, ticket creation, ticket update, delete, and admin views in production.</li>
-</ol>
+- APP_KEY: Your generated Laravel key
+- APP_URL: https://ai-safety-app-dxdbcyd7abg6d8cx.westus3-01.azurewebsites.net
+- DB_CONNECTION: sqlite
+- DB_DATABASE: /home/site/wwwroot/database/database.sqlite
+- FRONTEND_URL: Your live Static Web App URL
+- SANCTUM_STATEFUL_DOMAINS: Your frontend domain (no https)
+- GITHUB_TOKEN: Required for the AI Dispatcher
 
-<h2>SUBMISSION CHECKLIST</h2>
+### Frontend Static Web App
 
-<ul>
-<li>Source code uploaded to D2L.</li>
-<li>Presentation slides uploaded to D2L.</li>
-<li>Live demo working in Azure.</li>
-<li>Team members prepared to present.</li>
-</ul>
+Set these in Settings > Environment variables:
+
+- VITE_API_BASE_URL: https://ai-safety-app-dxdbcyd7abg6d8cx.westus3-01.azurewebsites.net/api
+
+## Submission Checklist
+
+- Source Code: Uploaded to D2L.
+- Presentation Slides: Uploaded to D2L.
+- Live Demo: Verified on Azure.
+- Team: All members ready for the April 16th presentation.
